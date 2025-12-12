@@ -2,33 +2,40 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, messagebox
+import matplotlib.colors as mcolors
 
-# Functie om de grafiek te tekenen
-def teken_grafiek(x_as_pos, y_as_pos, x_streep_dik, y_streep_dik, x_streep_dun, y_streep_dun, vierkant, cijferkleur, titel, x_as_label, y_as_label, titel_kleur, x_as_label_kleur, y_as_label_kleur):
-    plt.figure(figsize=(8, 8))  # Create the blank chart with a custom ratio
-    plt.plot([], [], linestyle='-', alpha=0)  # Add invisible plot to maintain structure
+# Helper functie om de grafiek te maken (elimineert code duplicatie)
+def _create_plot(x_as_pos, y_as_pos, x_streep_dik, y_streep_dik, x_streep_dun, y_streep_dun, 
+                 vierkant, cijferkleur, titel, x_as_label, y_as_label, titel_kleur, 
+                 x_as_label_kleur, y_as_label_kleur):
+    """
+    Creëert een matplotlib plot met de opgegeven parameters.
+    Deze functie wordt gebruikt door zowel teken_grafiek als save_grafiek.
+    """
+    plt.figure(figsize=(8, 8))
+    plt.plot([], [], linestyle='-', alpha=0)
 
     # Set axis limits
     plt.xlim(0, x_as_pos + 1)
     plt.ylim(0, y_as_pos + 1)
 
-    # Add thick lines every 10 units
+    # Add thick lines
     for x in range(0, x_as_pos + 1, x_streep_dik):
-        plt.axvline(x=x, color='black', linewidth=1.5)  # Thick vertical lines
+        plt.axvline(x=x, color='black', linewidth=1.5)
     for y in range(0, y_as_pos + 1, y_streep_dik):
-        plt.axhline(y=y, color='black', linewidth=1.5)  # Thick horizontal lines
+        plt.axhline(y=y, color='black', linewidth=1.5)
 
-    # Add thin lines every 5 units
+    # Add thin lines
     for x in range(0, x_as_pos + 1, x_streep_dun):
-        plt.axvline(x=x, color='gray', linewidth=1, linestyle='--')  # Thin vertical lines
+        plt.axvline(x=x, color='gray', linewidth=1, linestyle='--')
     for y in range(0, y_as_pos + 1, y_streep_dun):
-        plt.axhline(y=y, color='gray', linewidth=1, linestyle='--')  # Thin horizontal lines
+        plt.axhline(y=y, color='gray', linewidth=1, linestyle='--')
 
     # Make the axes thicker and black
-    ax = plt.gca()  # Get the current axes
-    ax.spines['bottom'].set_linewidth(3)  # Bottom spine (x-axis)
-    ax.spines['left'].set_linewidth(3)    # Left spine (y-axis)
+    ax = plt.gca()
+    ax.spines['bottom'].set_linewidth(3)
+    ax.spines['left'].set_linewidth(3)
 
     # Add arrows to the x and y axes
     ax.plot(1, 0, ">k", transform=ax.get_yaxis_transform(), clip_on=False)
@@ -44,90 +51,111 @@ def teken_grafiek(x_as_pos, y_as_pos, x_streep_dik, y_streep_dik, x_streep_dun, 
 
     # Set title and axis labels with color and alignment
     plt.title(titel, color=titel_kleur, fontsize=14)
-    plt.xlabel(x_as_label, color=x_as_label_kleur, fontsize=12, ha='right')  # X-as label rechts uitgelijnd
-    plt.ylabel(y_as_label, color=y_as_label_kleur, fontsize=12, va='top', rotation=0)  # Y-as label boven uitgelijnd en horizontaal
+    plt.xlabel(x_as_label, color=x_as_label_kleur, fontsize=12, ha='right')
+    plt.ylabel(y_as_label, color=y_as_label_kleur, fontsize=12, va='top', rotation=0)
 
     # Change the color of the tick labels
-    plt.tick_params(axis='x', colors=cijferkleur)  # X-as tick labels
-    plt.tick_params(axis='y', colors=cijferkleur)  # Y-as tick labels
+    plt.tick_params(axis='x', colors=cijferkleur)
+    plt.tick_params(axis='y', colors=cijferkleur)
 
-    # Show the plot
-    plt.show()
+# Functie om input te valideren
+def validate_inputs():
+    """
+    Valideert alle GUI inputs en retourneert een dictionary met de waarden.
+    Gooit een ValueError als de input ongeldig is.
+    """
+    try:
+        # Valideer integer inputs
+        x_as_pos = int(entry_x_as_pos.get())
+        y_as_pos = int(entry_y_as_pos.get())
+        x_streep_dik = int(entry_x_streep_dik.get())
+        y_streep_dik = int(entry_y_streep_dik.get())
+        x_streep_dun = int(entry_x_streep_dun.get())
+        y_streep_dun = int(entry_y_streep_dun.get())
+        
+        # Valideer dat waarden positief zijn
+        if x_as_pos <= 0 or y_as_pos <= 0:
+            raise ValueError("As posities moeten positief zijn")
+        if x_streep_dik <= 0 or y_streep_dik <= 0:
+            raise ValueError("Dikke streep afstanden moeten positief zijn")
+        if x_streep_dun <= 0 or y_streep_dun <= 0:
+            raise ValueError("Dunne streep afstanden moeten positief zijn")
+            
+        # Valideer kleuren
+        cijferkleur = entry_labelkleur.get().strip()
+        titel_kleur = entry_titel_kleur.get().strip()
+        x_as_label_kleur = entry_x_as_label_kleur.get().strip()
+        y_as_label_kleur = entry_y_as_label_kleur.get().strip()
+        
+        for kleur, naam in [(cijferkleur, "Label Kleur"), 
+                            (titel_kleur, "Titel Kleur"),
+                            (x_as_label_kleur, "X-as Label Kleur"),
+                            (y_as_label_kleur, "Y-as Label Kleur")]:
+            if not mcolors.is_color_like(kleur):
+                raise ValueError(f"'{kleur}' is geen geldige kleur voor {naam}")
+        
+        return {
+            'x_as_pos': x_as_pos,
+            'y_as_pos': y_as_pos,
+            'x_streep_dik': x_streep_dik,
+            'y_streep_dik': y_streep_dik,
+            'x_streep_dun': x_streep_dun,
+            'y_streep_dun': y_streep_dun,
+            'vierkant': var_vierkant.get(),
+            'cijferkleur': cijferkleur,
+            'titel': entry_titel.get(),
+            'x_as_label': entry_x_as_label.get(),
+            'y_as_label': entry_y_as_label.get(),
+            'titel_kleur': titel_kleur,
+            'x_as_label_kleur': x_as_label_kleur,
+            'y_as_label_kleur': y_as_label_kleur
+        }
+    except ValueError as e:
+        raise ValueError(f"Ongeldige input: {str(e)}")
+
+# Functie om de grafiek te tekenen
+def teken_grafiek():
+    try:
+        params = validate_inputs()
+        _create_plot(**params)
+        plt.show()
+    except ValueError as e:
+        messagebox.showerror("Invoerfout", str(e))
+    except Exception as e:
+        messagebox.showerror("Fout", f"Er is een fout opgetreden: {str(e)}")
 
 # Functie om de grafiek op te slaan
 def save_grafiek():
-    # Verkrijg de huidige waarden uit de GUI
-    x_as_pos = int(entry_x_as_pos.get())
-    y_as_pos = int(entry_y_as_pos.get())
-    x_streep_dik = int(entry_x_streep_dik.get())
-    y_streep_dik = int(entry_y_streep_dik.get())
-    x_streep_dun = int(entry_x_streep_dun.get())
-    y_streep_dun = int(entry_y_streep_dun.get())
-    vierkant = var_vierkant.get()
-    cijferkleur = entry_labelkleur.get()
-    titel = entry_titel.get()
-    x_as_label = entry_x_as_label.get()
-    y_as_label = entry_y_as_label.get()
-    titel_kleur = entry_titel_kleur.get()
-    x_as_label_kleur = entry_x_as_label_kleur.get()
-    y_as_label_kleur = entry_y_as_label_kleur.get()
-    bestandsnaam = entry_bestandsnaam.get()
-
-    # Specificeer het pad naar de Downloads-map
-    downloads_path = os.path.expanduser('~') + '/Downloads/'
-    if bestandsnaam == "":
-        bestandsnaam = "grafiek.png"  # Standaard naam als er geen naam is ingevoerd
-
-    # Sla de grafiek op zonder witte randen
-    plt.figure(figsize=(8, 8))  # Create the blank chart with a custom ratio
-    plt.plot([], [], linestyle='-', alpha=0)  # Add invisible plot to maintain structure
-
-    # Set axis limits
-    plt.xlim(0, x_as_pos + 1)
-    plt.ylim(0, y_as_pos + 1)
-
-    # Add thick lines every 10 units
-    for x in range(0, x_as_pos + 1, x_streep_dik):
-        plt.axvline(x=x, color='black', linewidth=1.5)  # Thick vertical lines
-    for y in range(0, y_as_pos + 1, y_streep_dik):
-        plt.axhline(y=y, color='black', linewidth=1.5)  # Thick horizontal lines
-
-    # Add thin lines every 5 units
-    for x in range(0, x_as_pos + 1, x_streep_dun):
-        plt.axvline(x=x, color='gray', linewidth=1, linestyle='--')  # Thin vertical lines
-    for y in range(0, y_as_pos + 1, y_streep_dun):
-        plt.axhline(y=y, color='gray', linewidth=1, linestyle='--')  # Thin horizontal lines
-
-    # Make the axes thicker and black
-    ax = plt.gca()  # Get the current axes
-    ax.spines['bottom'].set_linewidth(3)  # Bottom spine (x-axis)
-    ax.spines['left'].set_linewidth(3)    # Left spine (y-axis)
-
-    # Add arrows to the x and y axes
-    ax.plot(1, 0, ">k", transform=ax.get_yaxis_transform(), clip_on=False)
-    ax.plot(0, 1, "^k", transform=ax.get_xaxis_transform(), clip_on=False)
-
-    # Hide the top and right spines
-    ax.spines["top"].set_visible(False)
-    ax.spines["right"].set_visible(False)
-
-    # Set the aspect ratio to 'equal' to make the axes scale equally
-    if vierkant:
-        ax.set_aspect('equal', adjustable='box')
-
-    # Set title and axis labels with color and alignment
-    plt.title(titel, color=titel_kleur, fontsize=14)
-    plt.xlabel(x_as_label, color=x_as_label_kleur, fontsize=12, ha='right')  # X-as label rechts uitgelijnd
-    plt.ylabel(y_as_label, color=y_as_label_kleur, fontsize=12, va='top', rotation=0)  # Y-as label boven uitgelijnd en horizontaal
-
-    # Change the color of the tick labels
-    plt.tick_params(axis='x', colors=cijferkleur)  # X-as tick labels
-    plt.tick_params(axis='y', colors=cijferkleur)  # Y-as tick labels
-
-    # Save the plot to the Downloads folder with the provided file name
-    plt.savefig(downloads_path + bestandsnaam, dpi=300, bbox_inches='tight', pad_inches=0.1)
-
-    print(f"Grafiek opgeslagen als {downloads_path + bestandsnaam}")
+    try:
+        params = validate_inputs()
+        bestandsnaam = entry_bestandsnaam.get().strip()
+        
+        # Specificeer het pad naar de Downloads-map
+        downloads_path = os.path.join(os.path.expanduser('~'), 'Downloads')
+        
+        if bestandsnaam == "":
+            bestandsnaam = "grafiek.png"
+        
+        # Zorg ervoor dat de bestandsnaam eindigt op .png
+        if not bestandsnaam.endswith('.png'):
+            bestandsnaam += '.png'
+        
+        # Maak het volledige pad
+        full_path = os.path.join(downloads_path, bestandsnaam)
+        
+        # Creëer de grafiek
+        _create_plot(**params)
+        
+        # Sla de grafiek op
+        plt.savefig(full_path, dpi=300, bbox_inches='tight', pad_inches=0.1)
+        plt.close()  # Sluit de figuur om geheugen vrij te maken
+        
+        messagebox.showinfo("Succes", f"Grafiek opgeslagen als:\n{full_path}")
+        
+    except ValueError as e:
+        messagebox.showerror("Invoerfout", str(e))
+    except Exception as e:
+        messagebox.showerror("Fout", f"Er is een fout opgetreden bij het opslaan: {str(e)}")
 
 # Maak de GUI
 root = tk.Tk()
@@ -236,11 +264,7 @@ check_vierkant = ttk.Checkbutton(root, text="Maak Grafiek Vierkant", variable=va
 check_vierkant.grid(row=14, column=0, columnspan=2)
 
 # Knop om de grafiek te tekenen
-button_teken = ttk.Button(root, text="Teken Grafiek", command=lambda: teken_grafiek(
-    int(entry_x_as_pos.get()), int(entry_y_as_pos.get()), int(entry_x_streep_dik.get()), 
-    int(entry_y_streep_dik.get()), int(entry_x_streep_dun.get()), int(entry_y_streep_dun.get()),
-    var_vierkant.get(), entry_labelkleur.get(), entry_titel.get(), entry_x_as_label.get(),
-    entry_y_as_label.get(), entry_titel_kleur.get(), entry_x_as_label_kleur.get(), entry_y_as_label_kleur.get()))
+button_teken = ttk.Button(root, text="Teken Grafiek", command=teken_grafiek)
 button_teken.grid(row=15, column=0, columnspan=2)
 
 # Knop om de grafiek op te slaan
