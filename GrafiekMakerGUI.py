@@ -1,5 +1,4 @@
 import matplotlib.pyplot as plt
-import numpy as np
 import os
 import tkinter as tk
 from tkinter import ttk, messagebox
@@ -80,6 +79,12 @@ def validate_inputs():
             raise ValueError("Dikke streep afstanden moeten positief zijn")
         if x_streep_dun <= 0 or y_streep_dun <= 0:
             raise ValueError("Dunne streep afstanden moeten positief zijn")
+        
+        # Valideer dat streep afstanden niet groter zijn dan as posities
+        if x_streep_dik > x_as_pos or y_streep_dik > y_as_pos:
+            raise ValueError("Dikke streep afstanden mogen niet groter zijn dan as posities")
+        if x_streep_dun > x_as_pos or y_streep_dun > y_as_pos:
+            raise ValueError("Dunne streep afstanden mogen niet groter zijn dan as posities")
             
         # Valideer kleuren
         cijferkleur = entry_labelkleur.get().strip()
@@ -119,6 +124,7 @@ def teken_grafiek():
         params = validate_inputs()
         _create_plot(**params)
         plt.show()
+        plt.close()  # Sluit de figuur om geheugen vrij te maken
     except ValueError as e:
         messagebox.showerror("Invoerfout", str(e))
     except Exception as e:
@@ -160,115 +166,119 @@ def save_grafiek():
 # Maak de GUI
 root = tk.Tk()
 root.title("Grafiek Instellingen")
+root.geometry("450x650")  # Minimum venstergrootte
 
 # X-as positie
 label_x_as_pos = ttk.Label(root, text="X-as Positie:")
-label_x_as_pos.grid(row=0, column=0)
+label_x_as_pos.grid(row=0, column=0, padx=10, pady=5, sticky="w")
 entry_x_as_pos = ttk.Entry(root)
-entry_x_as_pos.grid(row=0, column=1)
+entry_x_as_pos.grid(row=0, column=1, padx=10, pady=5, sticky="ew")
 entry_x_as_pos.insert(0, "100")
 
 # Y-as positie
 label_y_as_pos = ttk.Label(root, text="Y-as Positie:")
-label_y_as_pos.grid(row=1, column=0)
+label_y_as_pos.grid(row=1, column=0, padx=10, pady=5, sticky="w")
 entry_y_as_pos = ttk.Entry(root)
-entry_y_as_pos.grid(row=1, column=1)
+entry_y_as_pos.grid(row=1, column=1, padx=10, pady=5, sticky="ew")
 entry_y_as_pos.insert(0, "100")
 
 # X-streep dikte
 label_x_streep_dik = ttk.Label(root, text="X-streep Dikte:")
-label_x_streep_dik.grid(row=2, column=0)
+label_x_streep_dik.grid(row=2, column=0, padx=10, pady=5, sticky="w")
 entry_x_streep_dik = ttk.Entry(root)
-entry_x_streep_dik.grid(row=2, column=1)
+entry_x_streep_dik.grid(row=2, column=1, padx=10, pady=5, sticky="ew")
 entry_x_streep_dik.insert(0, "10")
 
 # Y-streep dikte
 label_y_streep_dik = ttk.Label(root, text="Y-streep Dikte:")
-label_y_streep_dik.grid(row=3, column=0)
+label_y_streep_dik.grid(row=3, column=0, padx=10, pady=5, sticky="w")
 entry_y_streep_dik = ttk.Entry(root)
-entry_y_streep_dik.grid(row=3, column=1)
+entry_y_streep_dik.grid(row=3, column=1, padx=10, pady=5, sticky="ew")
 entry_y_streep_dik.insert(0, "10")
 
 # X-streep dunne lijn
 label_x_streep_dun = ttk.Label(root, text="X-streep Dun:")
-label_x_streep_dun.grid(row=4, column=0)
+label_x_streep_dun.grid(row=4, column=0, padx=10, pady=5, sticky="w")
 entry_x_streep_dun = ttk.Entry(root)
-entry_x_streep_dun.grid(row=4, column=1)
+entry_x_streep_dun.grid(row=4, column=1, padx=10, pady=5, sticky="ew")
 entry_x_streep_dun.insert(0, "5")
 
 # Y-streep dunne lijn
 label_y_streep_dun = ttk.Label(root, text="Y-streep Dun:")
-label_y_streep_dun.grid(row=5, column=0)
+label_y_streep_dun.grid(row=5, column=0, padx=10, pady=5, sticky="w")
 entry_y_streep_dun = ttk.Entry(root)
-entry_y_streep_dun.grid(row=5, column=1)
+entry_y_streep_dun.grid(row=5, column=1, padx=10, pady=5, sticky="ew")
 entry_y_streep_dun.insert(0, "5")
 
 # Labelkleur
 label_labelkleur = ttk.Label(root, text="Label Kleur:")
-label_labelkleur.grid(row=6, column=0)
+label_labelkleur.grid(row=6, column=0, padx=10, pady=5, sticky="w")
 entry_labelkleur = ttk.Entry(root)
-entry_labelkleur.grid(row=6, column=1)
+entry_labelkleur.grid(row=6, column=1, padx=10, pady=5, sticky="ew")
 entry_labelkleur.insert(0, "black")
 
 # Bestandsnaam
 label_bestandsnaam = ttk.Label(root, text="Bestandsnaam:")
-label_bestandsnaam.grid(row=7, column=0)
+label_bestandsnaam.grid(row=7, column=0, padx=10, pady=5, sticky="w")
 entry_bestandsnaam = ttk.Entry(root)
-entry_bestandsnaam.grid(row=7, column=1)
+entry_bestandsnaam.grid(row=7, column=1, padx=10, pady=5, sticky="ew")
 
 # Grafiektitel
 label_titel = ttk.Label(root, text="Grafiek Titel:")
-label_titel.grid(row=8, column=0)
+label_titel.grid(row=8, column=0, padx=10, pady=5, sticky="w")
 entry_titel = ttk.Entry(root)
-entry_titel.grid(row=8, column=1)
+entry_titel.grid(row=8, column=1, padx=10, pady=5, sticky="ew")
 entry_titel.insert(0, "Grafiek Titel")
 
 # X-as label
 label_x_as_label = ttk.Label(root, text="X-as Label:")
-label_x_as_label.grid(row=9, column=0)
+label_x_as_label.grid(row=9, column=0, padx=10, pady=5, sticky="w")
 entry_x_as_label = ttk.Entry(root)
-entry_x_as_label.grid(row=9, column=1)
+entry_x_as_label.grid(row=9, column=1, padx=10, pady=5, sticky="ew")
 entry_x_as_label.insert(0, "X-as")
 
 # Y-as label
 label_y_as_label = ttk.Label(root, text="Y-as Label:")
-label_y_as_label.grid(row=10, column=0)
+label_y_as_label.grid(row=10, column=0, padx=10, pady=5, sticky="w")
 entry_y_as_label = ttk.Entry(root)
-entry_y_as_label.grid(row=10, column=1)
+entry_y_as_label.grid(row=10, column=1, padx=10, pady=5, sticky="ew")
 entry_y_as_label.insert(0, "Y-as")
 
 # Titelkleur
 label_titel_kleur = ttk.Label(root, text="Titel Kleur:")
-label_titel_kleur.grid(row=11, column=0)
+label_titel_kleur.grid(row=11, column=0, padx=10, pady=5, sticky="w")
 entry_titel_kleur = ttk.Entry(root)
-entry_titel_kleur.grid(row=11, column=1)
+entry_titel_kleur.grid(row=11, column=1, padx=10, pady=5, sticky="ew")
 entry_titel_kleur.insert(0, "black")
 
 # X-as label kleur
 label_x_as_label_kleur = ttk.Label(root, text="X-as Label Kleur:")
-label_x_as_label_kleur.grid(row=12, column=0)
+label_x_as_label_kleur.grid(row=12, column=0, padx=10, pady=5, sticky="w")
 entry_x_as_label_kleur = ttk.Entry(root)
-entry_x_as_label_kleur.grid(row=12, column=1)
+entry_x_as_label_kleur.grid(row=12, column=1, padx=10, pady=5, sticky="ew")
 entry_x_as_label_kleur.insert(0, "black")
 
 # Y-as label kleur
 label_y_as_label_kleur = ttk.Label(root, text="Y-as Label Kleur:")
-label_y_as_label_kleur.grid(row=13, column=0)
+label_y_as_label_kleur.grid(row=13, column=0, padx=10, pady=5, sticky="w")
 entry_y_as_label_kleur = ttk.Entry(root)
-entry_y_as_label_kleur.grid(row=13, column=1)
+entry_y_as_label_kleur.grid(row=13, column=1, padx=10, pady=5, sticky="ew")
 entry_y_as_label_kleur.insert(0, "black")
 
 # Vierkant optie
 var_vierkant = tk.BooleanVar()
 check_vierkant = ttk.Checkbutton(root, text="Maak Grafiek Vierkant", variable=var_vierkant)
-check_vierkant.grid(row=14, column=0, columnspan=2)
+check_vierkant.grid(row=14, column=0, columnspan=2, padx=10, pady=10)
 
 # Knop om de grafiek te tekenen
 button_teken = ttk.Button(root, text="Teken Grafiek", command=teken_grafiek)
-button_teken.grid(row=15, column=0, columnspan=2)
+button_teken.grid(row=15, column=0, columnspan=2, padx=10, pady=10, sticky="ew")
 
 # Knop om de grafiek op te slaan
 button_opslaan = ttk.Button(root, text="Opslaan Grafiek", command=save_grafiek)
-button_opslaan.grid(row=16, column=0, columnspan=2)
+button_opslaan.grid(row=16, column=0, columnspan=2, padx=10, pady=10, sticky="ew")
+
+# Configureer kolom gewicht voor responsieve layout
+root.columnconfigure(1, weight=1)
 
 root.mainloop()
