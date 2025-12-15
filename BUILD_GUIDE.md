@@ -18,7 +18,7 @@ You can share `GrafiekMaker.exe` with anyone - they don't need Python or any dep
 
 If you make changes to the code, rebuild with:
 ```bash
-.venv\Scripts\pyinstaller.exe --onefile --windowed --name "GrafiekMaker" GrafiekMakerGUI.py
+.venv\Scripts\python.exe -m PyInstaller --onefile --windowed --clean --name "GrafiekMaker" GrafiekMakerGUI.py
 ```
 
 ### Build Options Explained
