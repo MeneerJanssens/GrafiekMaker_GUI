@@ -4,6 +4,9 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 import matplotlib.colors as mcolors
 
+# Lijst met veelvoorkomende kleuren voor de dropdowns
+COMMON_COLORS = ['black', 'red', 'blue', 'green', 'yellow', 'cyan', 'magenta', 'white', 'gray', 'purple', 'orange', 'brown']
+
 # Helper functie om de grafiek te maken (elimineert code duplicatie)
 def _create_plot(x_as_pos, y_as_pos, x_streep_dik, y_streep_dik, x_streep_dun, y_streep_dun, 
                  vierkant, cijferkleur, titel, x_as_label, y_as_label, titel_kleur, 
@@ -213,9 +216,9 @@ entry_y_streep_dun.insert(0, "5")
 # Labelkleur
 label_labelkleur = ttk.Label(root, text="Label Kleur:")
 label_labelkleur.grid(row=6, column=0, padx=10, pady=5, sticky="w")
-entry_labelkleur = ttk.Entry(root)
+entry_labelkleur = ttk.Combobox(root, values=COMMON_COLORS)
 entry_labelkleur.grid(row=6, column=1, padx=10, pady=5, sticky="ew")
-entry_labelkleur.insert(0, "black")
+entry_labelkleur.set("black")
 
 # Bestandsnaam
 label_bestandsnaam = ttk.Label(root, text="Bestandsnaam:")
@@ -247,23 +250,23 @@ entry_y_as_label.insert(0, "Y-as")
 # Titelkleur
 label_titel_kleur = ttk.Label(root, text="Titel Kleur:")
 label_titel_kleur.grid(row=11, column=0, padx=10, pady=5, sticky="w")
-entry_titel_kleur = ttk.Entry(root)
+entry_titel_kleur = ttk.Combobox(root, values=COMMON_COLORS)
 entry_titel_kleur.grid(row=11, column=1, padx=10, pady=5, sticky="ew")
-entry_titel_kleur.insert(0, "black")
+entry_titel_kleur.set("black")
 
 # X-as label kleur
 label_x_as_label_kleur = ttk.Label(root, text="X-as Label Kleur:")
 label_x_as_label_kleur.grid(row=12, column=0, padx=10, pady=5, sticky="w")
-entry_x_as_label_kleur = ttk.Entry(root)
+entry_x_as_label_kleur = ttk.Combobox(root, values=COMMON_COLORS)
 entry_x_as_label_kleur.grid(row=12, column=1, padx=10, pady=5, sticky="ew")
-entry_x_as_label_kleur.insert(0, "black")
+entry_x_as_label_kleur.set("black")
 
 # Y-as label kleur
 label_y_as_label_kleur = ttk.Label(root, text="Y-as Label Kleur:")
 label_y_as_label_kleur.grid(row=13, column=0, padx=10, pady=5, sticky="w")
-entry_y_as_label_kleur = ttk.Entry(root)
+entry_y_as_label_kleur = ttk.Combobox(root, values=COMMON_COLORS)
 entry_y_as_label_kleur.grid(row=13, column=1, padx=10, pady=5, sticky="ew")
-entry_y_as_label_kleur.insert(0, "black")
+entry_y_as_label_kleur.set("black")
 
 # Vierkant optie
 var_vierkant = tk.BooleanVar()
